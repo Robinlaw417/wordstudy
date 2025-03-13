@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单词学习工具</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input[type="text"] {
+            width: calc(50% - 10px);
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .word-card {
+            padding: 15px;
+            margin: 10px 0;
+            background-color: #f1f1f1;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 18px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>单词学习工具</h1>
+
+        <!-- 输入单词和中文意思 -->
+        <div>
+            <input type="text" id="english" placeholder="输入英文单词">
+            <input type="text" id="chinese" placeholder="输入中文意思">
+            <button onclick="addWord()">添加到单词库</button>
+        </div>
+
+        <!-- 显示单词库 -->
+        <div id="word-list"></div>
+
+        <!-- 复习单词 -->
+        <div>
+            <h2>复习单词</h2>
+            <button onclick="startReview()">开始复习</button>
+            <div id="review-area"></div>
+        </div>
+    </div>
+
+    <script>
+        let wordLibrary = []; // 单词库
+        let currentReviewIndex = 0; // 当前复习的单词索引
+
+        // 添加单词到单词库
+        function addWord() {
+            const english = document.getElementById('english').value.trim();
+            const chinese = document.getElementById('chinese').value.trim();
+
+            if (english && chinese) {
+                wordLibrary.push({ english, chinese });
+                updateWordList();
+                document.getElementById('english').value = '';
+                document.getElementById('chinese').value = '';
+            } else {
+                alert('请输入英文单词和中文意思！');
+            }
+        }
+
+        // 更新单词库显示
+        function updateWordList() {
+            const wordList = document.getElementById('word-list');
+            wordList.innerHTML = '<h2>单词库</h2>';
+            wordLibrary.forEach((word, index) => {
+                wordList.innerHTML += `<div class="word-card" onclick="showTranslation(${index})">
+                    <div>${word.english}</div>
+                    <div class="hidden">${word.chinese}</div>
+                </div>`;
+            });
+        }
+
+        // 显示翻译
+        function showTranslation(index) {
+            const card = document.querySelectorAll('.word-card')[index];
+            const translation = card.querySelector('.hidden');
+            translation.style.display = 'block';
+        }
+
+        // 开始复习
+        function startReview() {
+            if (wordLibrary.length === 0) {
+                alert('单词库为空，请先添加单词！');
+                return;
+            }
+            currentReviewIndex = 0;
+            showNextWord();
+        }
+
+        // 显示下一个单词
+        function showNextWord() {
+            const reviewArea = document.getElementById('review-area');
+            if (currentReviewIndex < wordLibrary.length) {
+                const word = wordLibrary[currentReviewIndex];
+                reviewArea.innerHTML = `
+                    <div class="word-card" onclick="toggleTranslation()">
+                        <div>${word.english}</div>
+                        <div class="hidden">${word.chinese}</div>
+                    </div>
+                    <button onclick="showNextWord()">下一个</button>
+                `;
+                currentReviewIndex++;
+            } else {
+                reviewArea.innerHTML = '<p>复习完成！</p>';
+            }
+        }
+
+        // 切换显示翻译
+        function toggleTranslation() {
+            const translation = document.querySelector('#review-area .hidden');
+            translation.style.display = translation.style.display === 'none' ? 'block' : 'none';
+        }
+    </script>
+
+</body>
+</html>
